@@ -38,7 +38,11 @@ def handler(event, context):
         if not indicator:
             return "Please enter an input"
 
+        ## first message to start thread + avoid timeout
         client = slack.WebClient(token=os.environ["SLACK_API_TOKEN"])
+        bot_message = '```Getting results for indicator: {}```'.format(indicator)
+        response = client.chat_postMessage(channel=channel, text=bot_message)
+        thread_ts = response["ts"]
 
         ## check if value is an IP
         ip_check = re.compile("^^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
@@ -61,16 +65,9 @@ def handler(event, context):
             return "No Results for indicator {}".format(indicator)
 
         ## create slack messages and send
-        first_item = True
         for result in vt_results:
             message = ""
             message += "```{} -> {}: {}```\n\n".format(indicator, result, vt_results[result])
-
-            if first_item:
-                response = client.chat_postMessage(channel=channel, text=message)
-                thread_ts = response["ts"]
-                first_item = False
-
             response = client.chat_postMessage(
                 channel=channel, text=message, thread_ts=thread_ts
             )
