@@ -11,6 +11,10 @@ provider:
     PASSIVETOTAL_USERNAME: "${self:custom.secrets.PASSIVETOTAL_USERNAME}"
     PASSIVETOTAL_APIKEY: "${self:custom.secrets.PASSIVETOTAL_APIKEY}"
     VT_API_KEY: "${self:custom.secrets.VT_API_KEY}"
+    MISP_API_KEY: "${self:custom.secrets.MISP_API_KEY}"
+    MISP_BASE_URL: "${self:custom.secrets.MISP_BASE_URL}"
+    JASK_API_KEY: "${self:custom.secrets.JASK_API_KEY}"
+    JASK_BASE_URL: "${self:custom.secrets.JASK_BASE_URL}"
 
 functions:
   query:
@@ -27,6 +31,26 @@ functions:
       - http:
           integration: LAMBDA
           path: vt
+          method: any
+          request:
+            passThrough: WHEN_NO_MATCH
+
+  misp:
+    handler: misp.handler
+    events:
+      - http:
+          integration: LAMBDA
+          path: misp
+          method: any
+          request:
+            passThrough: WHEN_NO_MATCH
+
+  jask:
+    handler: jask.handler
+    events:
+      - http:
+          integration: LAMBDA
+          path: jask
           method: any
           request:
             passThrough: WHEN_NO_MATCH
